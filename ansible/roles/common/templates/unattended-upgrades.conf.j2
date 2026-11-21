@@ -1,0 +1,6 @@
+APT::Periodic::Update-Package-Lists "1";
+APT::Periodic::Unattended-Upgrade "1";
+
+Unattended-Upgrade::Automatic-Reboot "{{ automatic_reboot | ternary('true', 'false') }}";
+Unattended-Upgrade::Automatic-Reboot-WithUsers "false";
+Unattended-Upgrade::Automatic-Reboot-Time "04:00";

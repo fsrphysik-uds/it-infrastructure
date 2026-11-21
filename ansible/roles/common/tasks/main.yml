@@ -1,15 +1,150 @@
 ---
-- name: Pakete aktualisieren
+# =============================================================================
+# 1. PAKETVERWALTUNG
+# =============================================================================
+
+- name: Paketindex aktualisieren
   ansible.builtin.apt:
     update_cache: true
     cache_valid_time: 3600
+  become: true
 
 - name: System aktualisieren
   ansible.builtin.apt:
-  upgrade: full
+    upgrade: full
+  become: true
+
+# Einige Werkzeuge überschneiden sich funktional, werden aber bewusst
+# parallel installiert, um unterschiedliche Admin-Präferenzen abzudecken.
 
 - name: Basispakete installieren
   ansible.builtin.apt:
     name:
+      # Netzwerk und Diagnostik
       - curl
-      - 
+      - dnsutils
+      - traceroute
+      - tcpdump
+      - netcat-openbsd
+
+      # Texteditoren
+      - vim
+      - nano
+
+      # Versionsverwaltung und Datenverarbeitung
+      - git
+      - jq
+
+      # Systemüberwachung
+      - btop
+      - htop
+
+      # Dateiverwaltung
+      - rsync
+      - tree
+
+      # Terminalwerkzeuge
+      - tmux
+
+      # Systemkonfiguration
+      - util-linux-extra
+      - console-setup
+      - keyboard-configuration
+
+      # Systemwartung und Sicherheitsupdates
+      - needrestart
+      - unattended-upgrades
+    state: present
+  become: true
+
+
+# =============================================================================
+# 2. SYSTEMIDENTITÄT
+# =============================================================================
+
+- name: Hostname setzen
+  ansible.builtin.hostname:
+    name: "{{ inventory_hostname }}"
+  become: true
+
+- name: Veralteten Hosteintrag entfernen
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    regexp: '^127\.0\.1\.1\s+'
+    state: absent
+  when: host_domain is defined
+  become: true
+
+- name: FQDN in /etc/hosts eintragen
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    regexp: "^{{ host_ip | regex_escape }}\\s+"
+    line: "{{ host_ip }} {{ inventory_hostname }}.{{ host_domain }} {{ inventory_hostname }}"
+  when: host_domain is defined
+  become: true
+
+
+# =============================================================================
+# 3. LOKALISIERUNG
+# =============================================================================
+
+- name: System- und Hardwareuhr konfigurieren
+  community.general.timezone:
+    hwclock: UTC
+    name: "{{ timezone }}"
+  become: true
+
+- name: Tastaturlayout konfigurieren
+  ansible.builtin.lineinfile:
+    path: /etc/default/keyboard
+    regexp: '^XKBLAYOUT='
+    line: 'XKBLAYOUT="{{ keymap }}"'
+  become: true
+  notify: Apply keyboard layout
+
+
+# =============================================================================
+# 4. SYSTEMD-JOURNALD
+# =============================================================================
+
+- name: Journald-Konfigurationsverzeichnis erstellen
+  ansible.builtin.file:
+    path: /etc/systemd/journald.conf.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  become: true
+
+- name: Journald konfigurieren
+  ansible.builtin.template:
+    src: journald.conf.j2
+    dest: /etc/systemd/journald.conf.d/10-base.conf
+    owner: root
+    group: root
+    mode: "0644"
+  become: true
+  notify: Restart journald
+
+
+# =============================================================================
+# 5. AUTOMATISCHE UPDATES UND NEUSTARTS
+# =============================================================================
+
+- name: Unattended-upgrades konfigurieren
+  ansible.builtin.template:
+    src: unattended-upgrades.conf.j2
+    dest: /etc/apt/apt.conf.d/60unattended-upgrades-local
+    owner: root
+    group: root
+    mode: "0644"
+  become: true
+
+- name: Needrestart konfigurieren
+  ansible.builtin.template:
+    src: needrestart.conf.j2
+    dest: /etc/needrestart/conf.d/10-base.conf
+    owner: root
+    group: root
+    mode: "0644"
+  become: true

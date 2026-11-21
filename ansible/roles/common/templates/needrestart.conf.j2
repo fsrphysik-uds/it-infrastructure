@@ -1,0 +1,28 @@
+# needrestart - Restart daemons after library updates.
+
+# Verbosity:
+# 0 => quiet
+# 1 => normal (default)
+# 2 => verbose
+#$nrconf{verbosity} = 2;
+
+# Restart mode:
+# l => list only
+# i => interactive
+# a => automatically
+$nrconf{restart} = '{{ needrestart_mode }}';
+
+# Default answer 'no' in interactive mode
+$nrconf{defno} = 1;
+
+# UI mode: easy or advanced
+$nrconf{ui_mode} = 'e';
+
+# Notifications to user sessions
+$nrconf{sendnotify} = 1;
+
+# Kernel update notifications
+#$nrconf{kernelhints} = -1;
+
+# CPU microcode update notifications
+#$nrconf{ucodehints} = 0;

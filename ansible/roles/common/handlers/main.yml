@@ -1,0 +1,11 @@
+---
+- name: Apply keyboard layout
+  ansible.builtin.command:
+    cmd: setupcon -k
+  become: true
+
+- name: Restart journald
+  ansible.builtin.systemd_service:
+    name: systemd-journald
+    state: restarted
+  become: true

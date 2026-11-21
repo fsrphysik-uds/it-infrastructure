@@ -1,0 +1,7 @@
+---
+# Ersteinrichtung bzw. vollständige Konfiguration aller Systeme.
+
+- name: Grundkonfiguration aller Systeme
+  hosts: all
+  roles:
+    - common

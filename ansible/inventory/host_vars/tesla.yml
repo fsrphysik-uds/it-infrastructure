@@ -1,0 +1,24 @@
+# User, über den Ansible die Konfigurationen vornimmt (muss existieren!)
+ansible_user: adminfsr
+
+# Networking
+host_ip: 10.96.1.75
+
+# Zeitzone UTC, um Sommer-/Winterzeit zu umgehen (gut für Logs, Datenbanken, etc.)
+timezone: Europe/Berlin
+
+# Journaling Settings
+journald_storage: persistent
+journald_max_use: 500M
+journald_max_file_size: 50M
+journald_max_retention: 2weeks
+journald_compress: "yes"
+journald_forward_to_syslog: "no"
+journald_rate_limit_interval: 30s
+journald_rate_limit_burst: 1000
+
+# Automatischer Neustart bei Updates durch unattended upgrades
+automatic_reboot: true
+
+# Neustart von Diensten durch needrestart
+needrestart_mode: i

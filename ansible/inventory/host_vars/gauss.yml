@@ -1,0 +1,25 @@
+# User, über den Ansible die Konfigurationen vornimmt (muss existieren!)
+ansible_user: admingauss
+
+# Networking
+host_domain: fs.uni-saarland.de
+host_ip: 10.96.1.74
+
+# Zeitzone UTC, um Sommer-/Winterzeit zu umgehen (gut für Logs, Datenbanken, etc.)
+timezone: UTC
+
+# Journaling Settings
+journald_storage: persistent
+journald_max_use: 2G
+journald_max_file_size: 200M
+journald_max_retention: 3months
+journald_compress: "yes"
+journald_forward_to_syslog: "no"
+journald_rate_limit_interval: 30s
+journald_rate_limit_burst: 10000
+
+# Automatischer Neustart bei Updates durch unattended upgrades
+automatic_reboot: false
+
+# Neustart von Diensten durch needrestart
+needrestart_mode: l
