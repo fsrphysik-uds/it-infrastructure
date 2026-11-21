@@ -1,0 +1,15 @@
+---
+- name: Pakete aktualisieren
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: System aktualisieren
+  ansible.builtin.apt:
+  upgrade: full
+
+- name: Basispakete installieren
+  ansible.builtin.apt:
+    name:
+      - curl
+      - 
